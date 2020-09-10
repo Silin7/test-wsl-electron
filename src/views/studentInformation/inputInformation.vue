@@ -14,7 +14,7 @@
         </div>
         
         <div class="addClass">
-          <el-button plain style="width: 80%;" @click="aaa">添加班级</el-button>
+          <el-button plain style="width: 80%;" @click="tjbj">添加班级</el-button>
         </div>
       </el-aside>
       
@@ -63,9 +63,12 @@
 </template>
 
 <script>
-  import calssInfo from '@/api/calssInfo'
+  // import aaa from '../../background.js'
   import "../../styleSheet/projectStyle/studentInformation.scss"
   export default {
+    mounted () {
+      console.log(111)
+    },
     data() {
       return {
         tableData: [{
@@ -88,8 +91,8 @@
       }
     },
     methods: {
-      aaa () {
-        calssInfo.aaa()
+      tjbj() {
+        console.log(aaa)
       },
       tableRowClassName({row, rowIndex}) {
         if (rowIndex === 1) {

@@ -88,12 +88,5 @@ if (isDevelopment) {
   }
 }
 
-// const fs = require ('fs')
-// fs .mkdir('logs', (error) => {
-//   if(error){
-//     console .log(error)
-//   } else {
-//     console .log('成功创建目录：logs')
-//   }
-// })
-// console.log(fs)
+const fs = require ('fs')
+console.log(fs)

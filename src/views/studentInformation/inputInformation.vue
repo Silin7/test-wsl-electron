@@ -63,12 +63,8 @@
 </template>
 
 <script>
-  // import aaa from '../../background.js'
   import "../../styleSheet/projectStyle/studentInformation.scss"
   export default {
-    mounted () {
-      console.log(111)
-    },
     data() {
       return {
         tableData: [{

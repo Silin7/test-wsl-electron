@@ -1,0 +1,27 @@
+.page_box {
+  height: 100%;
+  box-sizing:border-box;
+  padding: 0 20vw;
+  background-color: #C0BEB5;
+}
+
+.main-container {
+  height: 100vh;
+  padding: 0;
+  border: 1px solid red;
+}
+.diaryPageqp01 {
+  position: absolute;
+  top: 10%;
+  left: 80px;
+}
+.diaryPageqp02 {
+  position: absolute;
+  top: 30%;
+  right: 0px;
+}
+.diaryPageqp03 {
+  position: absolute;
+  top: 60%;
+  left: 120px;
+}

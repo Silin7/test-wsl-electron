@@ -1,0 +1,44 @@
+.page_box {
+  height: 100vh;
+  // background-color: #C0BEB5;
+}
+
+.calssList {
+  height: 90vh;
+}
+
+.classItem {
+  width: 180px;
+  height: 50px;
+  border: 1px solid #BDBDBD;
+  margin: 20px auto;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+
+
+.addClass {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+
+
+
+
+
+
+
+.el-table .warning-row {
+  background: oldlace;
+}
+
+.el-table .success-row {
+  background: #f0f9eb;
+}

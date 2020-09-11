@@ -6,9 +6,6 @@ import 'element-ui/lib/theme-chalk/index.css';
 import '../src/styleSheet/index.scss'
 import "../src/styleSheet/animate/animate.min.css"
 
-// Vue.prototype.$calssInfo = calssInfo
-
-
 Vue.use(ElementUI);
 
 Vue.config.productionTip = false

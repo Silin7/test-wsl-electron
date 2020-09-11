@@ -88,7 +88,6 @@
     },
     methods: {
       tjbj() {
-        console.log(aaa)
       },
       tableRowClassName({row, rowIndex}) {
         if (rowIndex === 1) {

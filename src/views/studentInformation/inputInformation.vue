@@ -63,6 +63,10 @@
 </template>
 
 <script>
+  import {
+        getModelAll,
+        postModel
+    } from '../../api/calssInfo.js'
   import "../../styleSheet/projectStyle/studentInformation.scss"
   export default {
     data() {

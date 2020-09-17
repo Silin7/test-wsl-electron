@@ -1,7 +1,9 @@
 <template>
   <div class="page_box bs_bx">
     <el-container style="height: 100vh; border: 1px solid #eee">
+      <!-- 添加班级 -->
       <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+        <!-- 班级列表 -->
         <div class="calssList">
           <div class="classItem">
             <span><i class="el-icon-user-solid"></i> 七年级一班</span>
@@ -12,12 +14,12 @@
             <span><i class="el-icon-caret-right"></i></span>
           </div>
         </div>
-        
+        <!-- 添加班级 -->
         <div class="addClass">
-          <el-button plain style="width: 80%;" @click="tjbj">添加班级</el-button>
+          <el-button plain style="width: 80%;" @click="addClassRoom">添加班级</el-button>
         </div>
       </el-aside>
-      
+      <!-- 学生姓名列表 -->
       <el-container>
         <el-main>
           <el-table
@@ -53,8 +55,8 @@
           </el-table-column>
           </el-table>
           <div style="margin-top: 20px">
-            <el-button @click="toggleSelection([tableData[1], tableData[2]])">切换第二、第三行的选中状态</el-button>
-            <el-button @click="toggleSelection()">取消选择</el-button>
+            <el-button>切换第二、第三行的选中状态</el-button>
+            <el-button>取消选择</el-button>
           </div>
         </el-main>
       </el-container>
@@ -63,11 +65,9 @@
 </template>
 
 <script>
-  import {
-        getModelAll,
-        postModel
-    } from '../../api/calssInfo.js'
   import "../../styleSheet/projectStyle/studentInformation.scss"
+  const fs = require('fs')
+  const path = require('path')
   export default {
     data() {
       return {
@@ -91,7 +91,12 @@
       }
     },
     methods: {
-      tjbj() {
+      addClassRoom() {
+        // let urlPath = path.join(process.cwd(), '/src/dataJson/calssRoom/classInfo.json')
+        // console.log(urlPath)
+        // let data = fs.readFileSync(urlPath,'utf8')
+        // let jsonobj = JSON.parse(data);
+        // console.log(jsonobj)
       },
       tableRowClassName({row, rowIndex}) {
         if (rowIndex === 1) {
@@ -101,24 +106,12 @@
         }
         return '';
       },
-       handleEdit(index, row) {
+      handleEdit(index, row) {
         console.log(index, row);
       },
       handleDelete(index, row) {
         console.log(index, row);
-      },
-      toggleSelection(rows) {
-        if (rows) {
-          rows.forEach(row => {
-            this.$refs.multipleTable.toggleRowSelection(row);
-          });
-        } else {
-          this.$refs.multipleTable.clearSelection();
-        }
-      },
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
-      },
+      }
     }
   }
 </script>

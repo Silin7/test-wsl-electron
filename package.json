@@ -16,6 +16,7 @@
     "dayjs": "^1.8.35",
     "downloadjs": "^1.4.7",
     "element-ui": "^2.13.2",
+    "express": "^4.17.1",
     "fs-extra": "^8.0.1",
     "lodash-id": "^0.14.0",
     "lowdb": "^1.0.0",

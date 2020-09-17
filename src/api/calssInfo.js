@@ -3,7 +3,6 @@ import db from '../datastore'
 import _ from 'lodash'
 
 const Table = 'user'
-// const db = remote.getGlobal("db")
 
 export function login(data) {
     return new Promise((resolve, reject) => {

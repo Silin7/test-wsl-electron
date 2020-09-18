@@ -110,7 +110,7 @@ import { isNull } from 'util';
     },
     data() {
       return {
-        myGradeList: [],
+        dataList: [],
         dialogVisible: false,
         grade: '',
         gradeTxt: '',
@@ -255,21 +255,25 @@ import { isNull } from 'util';
     methods: {
       getFileList() {
         let _this = this
+        let fileList = []
         let urlPath = path.join(process.cwd(), '/src/dataJson/')
         fs.readdir(urlPath, function (err, files) {
-          if (err) {
-            console.log(err)
-          } else {
-            files.forEach((file) => {
-              console.log(file.split('.')[0])
-              _this.myGradeList.push(file.split('.')[0])
-            })
+          for(let i = 0; i < files.length; i++) {
+            _this.dataList.push(JSON.parse(fs.readFileSync(urlPath + files[i])))
+            console.log(_this.dataList)
           }
+          // if (err) {
+          //   console.log(err)
+          // } else {
+          //   files.forEach((file) => {
+          //     console.log(file.split('.')[0])
+          //     _this.myGradeList.push(file.split('.')[0])
+          //   })
+          // }
         })
       },
       // 选择班级
       addClassRoom() {
-        console.log(this.myGradeList)
         this.dialogVisible = true;
       },
       // 添加班级
@@ -287,6 +291,11 @@ import { isNull } from 'util';
         })
         this.classRoomId = this.grade + this.banj
         this.classRoomName = this.gradeTxt + this.banjTxt
+        this.dataList.forEach(item => {
+          if (item.classRoomId === this.classRoomId) {
+            this.isNext = false
+          }
+        })
         let data = {
           classRoomId: this.classRoomId,
           classRoomName: this.classRoomName,

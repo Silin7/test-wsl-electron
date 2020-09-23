@@ -21,10 +21,28 @@
   cursor: pointer;
 }
 
-
-
 .addClass {
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.currentClass {
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .currentClass_span  {
+    font-size: 20px;
+    font-weight: 700;
+    color: #BDBDBD;
+    letter-spacing: 3px;
+  }
+}
+
+.saveStudent {
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   align-items: center;

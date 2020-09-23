@@ -28,15 +28,23 @@
 </template>
 
 <script>
+  import { truncate } from 'fs-extra'
+  import { isNull } from 'util'
+  import { constants } from 'zlib';
+  import { json } from 'body-parser';
+  const fs = require('fs')
+  const path = require('path')
   export default {
     mounted() {
       this.diaryShow = true;
       this.noteShow = true;
+      this.getFileList()
     },
     data() {
       return {
         diaryShow: '',
         noteShow: '',
+        dataList: []
       }
     },
     methods: {
@@ -53,6 +61,18 @@
         setTimeout(() => {
           this.$router.push({ name: 'inputInformation' })
         }, 1000);
+      },
+      // 获取文件列表
+      getFileList() {
+        let _this = this
+        let fileList = []
+        let urlPath = path.join(process.cwd(), '/src/dataJson/')
+        fs.readdir(urlPath, function (err, files) {
+          for(let i = 0; i < files.length; i++) {
+            console.log(JSON.parse(fs.readFileSync(urlPath + files[i])))
+            _this.dataList.push(fs.readFileSync(urlPath + files[i]))
+          }
+        })
       },
     }
   }

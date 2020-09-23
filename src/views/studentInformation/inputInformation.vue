@@ -5,12 +5,8 @@
       <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
         <!-- 班级列表 -->
         <div class="calssList">
-          <div class="classItem">
-            <span><i class="el-icon-user-solid"></i> 七年级一班</span>
-            <span><i class="el-icon-caret-right"></i></span>
-          </div>
-          <div class="classItem">
-            <span><i class="el-icon-user-solid"></i> 七年级二班</span>
+          <div class="classItem" v-for="(item, index) in dataList" :key="index" @click="currentClass(item)">
+            <span><i class="el-icon-user-solid"></i> {{item.classRoomName}}</span>
             <span><i class="el-icon-caret-right"></i></span>
           </div>
         </div>
@@ -18,56 +14,43 @@
         <div class="addClass">
           <el-button plain style="width: 80%;" @click="addClassRoom">添加班级</el-button>
         </div>
-      <el-popover
-        placement="right"
-        width="400"
-        trigger="click">
-      </el-popover>
       </el-aside>
       <!-- 学生姓名列表 -->
       <el-container>
-        <el-main>
-          <el-table
-            :data="tableData"
-            height="80vh"
-            border
-            style="width: 100%"
-            :row-class-name="tableRowClassName">
-            <el-table-column
-              prop="date"
-              label="日期"
-              width="180">
+        <el-main v-if="currentItem .classRoomId">
+          <div class="currentClass">
+            <span class="currentClass_span">当前班级： {{currentItem .classRoomName}}</span>
+            <el-button type="text" @click="quitePage">退出 <i class="el-icon-switch-button"></i></el-button>
+          </div>
+          <el-table :data="currentItem.studentList" height="80vh" border style="width: 100%" :row-class-name="tableRowClassName">
+            <el-table-column align="center" header-align="center" prop="stNumber" label="学号" sortable></el-table-column>
+            <el-table-column align="center" header-align="center" prop="stName" label="姓名"></el-table-column>
+            <el-table-column align="center" header-align="center" prop="stClass" label="班级"></el-table-column>
+            <el-table-column align="center" header-align="right" >
+              <template slot="header" slot-scope="scope">
+                <el-button @click="addStudent">新增</el-button>
+              </template>
+              <template slot-scope="scope">
+                <!-- 修改有bug，不想解决了，暂时注释 -->
+                <!-- <el-button style="width: 40% !important;" @click="handleEdit(scope.$index, scope.row)">修改</el-button> -->
+                <el-button style="width: 60% !important;" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+              </template>
             </el-table-column>
-            <el-table-column
-              prop="name"
-              label="姓名"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="address"
-              label="地址">
-            </el-table-column>
-            <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-              <el-button
-                size="mini"
-                type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
           </el-table>
-          <div style="margin-top: 20px">
-            <el-button>切换第二、第三行的选中状态</el-button>
-            <el-button>取消选择</el-button>
+          <div class="saveStudent" v-if="currentItem.studentList.length > 0">
+            <el-button style="width: 100% !important;" type="primary" @click="saveStudent">保存</el-button>
+          </div>
+        </el-main>
+        <el-main v-else>
+          <div class="currentClass">
+            <span class="currentClass_span"> </span>
+            <el-button type="text" @click="quitePage">退出 <i class="el-icon-switch-button"></i></el-button>
           </div>
         </el-main>
       </el-container>
     </el-container>
     <!-- 选择班级弹框 -->
-    <el-dialog title="请选择班级" :visible.sync="dialogVisible" width="60%" modal>
+    <el-dialog title="请选择班级" :visible.sync="addClassDialog" width="60%" modal>
       <el-row :gutter="20">
         <el-col :span="12">
           <el-select v-model="grade" placeholder="请选择" style="width: 100%;">
@@ -91,8 +74,26 @@
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button @click="addClassDialog = false">取 消</el-button>
         <el-button type="primary" @click="addGrade">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 新增同学 -->
+    <el-dialog title="请选择班级" :visible.sync="addStudentDialog" width="60%" modal>
+      <el-form label-position="top" label-width="80px" :model="stInfomation">
+        <el-form-item label="学号">
+          <el-input v-model="stInfomation.stNumber" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="姓名">
+          <el-input v-model="stInfomation.stName" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="班级">
+          <el-input v-model="stInfomation.stClass" clearable></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addStudentDialog = false">取 消</el-button>
+        <el-button type="primary" @click="saveAddStudent">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -100,8 +101,10 @@
 
 <script>
   import "../../styleSheet/projectStyle/studentInformation.scss"
-import { truncate } from 'fs-extra';
-import { isNull } from 'util';
+  import { truncate } from 'fs-extra'
+  import { isNull } from 'util'
+  import { constants } from 'zlib';
+  import { json } from 'body-parser';
   const fs = require('fs')
   const path = require('path')
   export default {
@@ -111,31 +114,22 @@ import { isNull } from 'util';
     data() {
       return {
         dataList: [],
-        dialogVisible: false,
+        currentItem: {},
+        stInfomation: {
+          stNumber: '',
+          stName: '',
+          stClass: '',
+        },
+        addClassDialog: false,
+        addStudentType: -1,
+        addStudentDialog: false,
         grade: '',
         gradeTxt: '',
         banj: '',
         banjTxt: '',
         classRoomId: '',
         classRoomName: '',
-        isNext: true,
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }],
+        tableData: [],
         gradeList: [
           {
             value: 'G1',
@@ -253,32 +247,29 @@ import { isNull } from 'util';
       }
     },
     methods: {
+      // 读取本地json
       getFileList() {
         let _this = this
         let fileList = []
         let urlPath = path.join(process.cwd(), '/src/dataJson/')
         fs.readdir(urlPath, function (err, files) {
           for(let i = 0; i < files.length; i++) {
+            console.log(JSON.parse(fs.readFileSync(urlPath + files[i])))
             _this.dataList.push(JSON.parse(fs.readFileSync(urlPath + files[i])))
-            console.log(_this.dataList)
+            // _this.dataList.push(fs.readFileSync(urlPath + files[i]))
           }
-          // if (err) {
-          //   console.log(err)
-          // } else {
-          //   files.forEach((file) => {
-          //     console.log(file.split('.')[0])
-          //     _this.myGradeList.push(file.split('.')[0])
-          //   })
-          // }
         })
-      },
-      // 选择班级
-      addClassRoom() {
-        this.dialogVisible = true;
+        // this.dataList.forEach(element => {
+        //   element = JSON.parse(element)
+        // });
       },
       // 添加班级
+      addClassRoom() {
+        this.addClassDialog = true;
+      },
       addGrade() {
         let _this = this
+        let addGradeNext = true
         this.gradeList.forEach(item => {
           if (item.value === this.grade) {
             this.gradeTxt = item.label
@@ -293,7 +284,8 @@ import { isNull } from 'util';
         this.classRoomName = this.gradeTxt + this.banjTxt
         this.dataList.forEach(item => {
           if (item.classRoomId === this.classRoomId) {
-            this.isNext = false
+            addGradeNext = false
+            this.$message.error(`您已经添加了${this.classRoomName}`);
           }
         })
         let data = {
@@ -303,11 +295,124 @@ import { isNull } from 'util';
         }
         let urlPath = path.join(process.cwd(), `/src/dataJson/${this.classRoomId}.json`)
         let dataJson = JSON.stringify(data)
-        if (this.isNext) {
+        if (addGradeNext) {
           fs.writeFileSync(urlPath, dataJson)
+          this.$message.success(`您已成功添加${this.classRoomName}`)
         }
-        this.dialogVisible = false
+        this.addClassDialog = false
       },
+      // 显示当前班级信息
+      currentClass(item) {
+        this.currentItem = item
+      },
+      // 添加学生
+      addStudent() {
+        this.addStudentType = -1
+        this.stInfomation = {
+          stNumber: '',
+          stName: '',
+          stClass: '',
+        }
+        this.addStudentDialog = true
+      },
+      saveAddStudent() {
+        let _this = this
+        let saveAddStudentNext = true
+        if (this.stInfomation.stNumber === '') {
+          this.$message.error('请填写学生学号')
+          return
+        } else {
+          if (_this.currentItem.studentList.length > 0) {
+            _this.currentItem.studentList.forEach(item => {
+              console.log(item.stNumber)
+              console.log(_this.stInfomation.stNumbe)
+              if (item.stNumber === _this.stInfomation.stNumber) {
+                saveAddStudentNext = false
+                _this.$message.error('学生学号重复')
+              }
+            })
+            // for (let i = 0; i < _this.currentItem.studentList.length > 0; i++) {
+            //   if (_this.currentItem.studentList[i].stNumber === _this.stInfomation.stNumber) {
+            //     console.log(_this.currentItem.studentList[i].stNumber)
+            //     console.log(_this.stInfomation.stNumber)
+            //     saveAddStudentNext = false
+            //     _this.$message.error('学生学号重复')
+            //   }
+            // }
+          }
+        }
+        if (/^[0-9]*$/.test(this.stInfomation.stNumber) === false) {
+          this.$message.error('学生学号应为纯数字')
+          return
+        }
+        if (this.stInfomation.stName === '') {
+          this.$message.error('请填写学生姓名')
+          return
+        }
+        if (this.stInfomation.stClass === '') {
+          this.$message.error('请填写学生班级')
+          return
+        }
+        console.log(saveAddStudentNext)
+        if (saveAddStudentNext) {
+          // addStudentType小于0为新增学生信息，大于0为修改学生信息
+          if (this.addStudentType < 0) {
+            this.currentItem.studentList.push(this.stInfomation)
+            this.$message.success('新增学生信息成功')
+          } else {
+            this.currentItem.studentList.splice(this.addStudentType, 1, row)
+            this.$message.success('修改学生信息成功')
+          }
+          this.addStudentDialog = false
+        }
+      },
+      saveStudent() {
+        let _this = this
+        let currentItemJson = JSON.stringify(this.currentItem)
+        let urlPath = path.join(process.cwd(), '/src/dataJson/', this.currentItem.classRoomId + '.json')
+        console.log(urlPath)
+        console.log(currentItemJson)
+        // fs.writeFileSync(urlPath, currentItemJson)
+        fs.writeFile(urlPath, currentItemJson, (err) => {
+            _this.$message.success('保存成功')
+          // if (err) {
+          //   console.log(err)
+          // } else {
+          //   _this.$message.success('保存成功')
+          // }
+        });
+      },
+      // 修改学生信息
+      handleEdit(index, row) {
+        this.addStudentType = index
+        this.stInfomation = row
+        this.addStudentDialog = true
+      },
+      // 删除学生信息
+      handleDelete(index, row) {
+        let _this = this
+        this.$confirm('您确定删除这条学生信息吗?', '', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+           _this.currentItem.studentList.splice(index, 1)
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+      },
+      // 退出系统
+      quitePage() {
+        this.$router.go(-1)
+      },
+      // 渐变色
       tableRowClassName({row, rowIndex}) {
         if (rowIndex === 1) {
           return 'warning-row';
@@ -315,14 +420,6 @@ import { isNull } from 'util';
           return 'success-row';
         }
         return '';
-      },
-
-      handleEdit(index, row) {
-        console.log(index, row);
-        this.getFileList()
-      },
-      handleDelete(index, row) {
-        console.log(index, row);
       }
     }
   }
